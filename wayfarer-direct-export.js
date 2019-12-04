@@ -119,7 +119,7 @@ function init() {
 		const outputHl = 'id,timestamp,title,description,lat,lng,status,nickname,submitteddate,responsedate,candidateimageurl';
 		let outputStr = '';
 		candidates.forEach(function(item) {
-			outputStr += '\n' + item.id + ',' + item.timestamp + ',' + item.title + ',' + item.description + ',' + item.lat + ',' + item.lng + ',' + item.status + ',' + item.nickname + ',' + item.submitteddate + ',' + item.responsedate + ',' + item.imageurl;
+			outputStr += '\n' + item.id + ',' + item.timestamp + ',"' + item.title + '","' + item.description + '",' + item.lat + ',' + item.lng + ',' + item.status + ',' + item.nickname + ',' + item.submitteddate + ',' + item.responsedate + ',' + item.imageurl;
 		});
 		let output = outputHl + outputStr;
 		return output;
