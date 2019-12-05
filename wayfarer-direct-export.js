@@ -64,11 +64,12 @@ function init() {
 	}
 
 	function newDialog() {
-		let textareaContent = generateOutput();
+		let choice = 'csv';
+		let textareaContent = generateOutput(choice);
 		let newDiaContent = '<div class="modal-dialog" role="document" style="width: 420px;">'
         + '<div class="modal-content">'
         +  '<div class="modal-header">'
-        +    '<h5 class="modal-title">Output Candidates</h5>'
+        +    '<h3 class="modal-title">Output Candidates</h3>'
         +    '<button id="closeDiaX" type="button" class="close" data-dismiss="modal" aria-label="Close">'
         +      '<span aria-hidden="true">&times;</span>'
         +    '</button>'
@@ -77,21 +78,23 @@ function init() {
         +    '<div class="input-group mb-3">'
         +      '<textarea id="outputCandidates" style="height: 300px; width: 400px;" class="form-control" aria-label="Candidates output">' + textareaContent + '</textarea>'
         +    '</div>'
-// preparation for sql export
-/*        +    '<div class="btn-toolbar" style="margin-bottom: 20px;">'
+        +    '<div>'
         +      '<div>'
-        +        '<div class="form-check">'
-        +          '<input class="form-check-input" type="radio" name="exportType" id="exportTypeSQL" value="sql" checked>'
-        +          '<label class="form-check-label" for="exportTypeSQL">MySQL</label>'
-        +        '</div>'
-        +        '<div class="form-check">'
-        +          '<input class="form-check-input" type="radio" name="exportType" id="exportTypeCSV" value="csv">'
-        +          '<label class="form-check-label" for="exportTypeCSV">CSV</label>'
+        +        '<div style="margin-left: 10px; margin-top: 10px;">'
+        +          '<label class="nom-arrange-label" style="margin-right: 20px;">'
+        +          '<span style="margin-right: 10px; vertical-align: 0.3em;">CSV</span>'
+        +          '<input class="radio-btn" type="radio" name="exportType" id="exportTypeCSV" value="csv" checked>'
+        +          '</label>'
+        +          '<label class="nom-arrange-label">'
+        +          '<span style="margin-right: 10px; vertical-align: 0.3em;">SQL</span>'
+        +          '<input class="radio-btn" type="radio" name="exportType" id="exportTypeSQL" value="sql">'
+        +          '</label>'
         +        '</div>'
         +      '</div>'
-        +    '</div>'*/
+        +    '</div>'
         +  '</div>'
         +  '<div class="modal-footer">'
+// to do: save as file
         +    '<button id="copyOutput" class="button-secondary" type="button" style="margin-right: 15px;" float-left>Copy output</button>'
         +    '<button id="closeDia" class="button-primary" type="button">Close</button>'
         +  '</div>'
@@ -103,6 +106,7 @@ function init() {
   		let existingDiv = document.querySelector('.container');
   		let create = existingDiv.appendChild(newDia);
   		document.getElementById("outputDialog").showModal();
+  		document.getElementById("outputCandidates").focus();
   		document.getElementById("closeDia").addEventListener("click", () => {
           document.getElementById("outputDialog").close();
         });
@@ -113,16 +117,37 @@ function init() {
           document.getElementById("outputCandidates").select();
           document.execCommand('copy');
         });
+        document.getElementById("exportTypeCSV").addEventListener("click", () => {
+          choice = 'csv';
+          textareaContent = generateOutput(choice);
+          document.getElementById("outputCandidates").value = textareaContent;
+        });
+        document.getElementById("exportTypeSQL").addEventListener("click", () => {
+          choice = 'sql';
+          textareaContent = generateOutput(choice);
+          document.getElementById("outputCandidates").value = textareaContent;
+        });
 	}
 
-	function generateOutput() {
-		const outputHl = 'id,timestamp,title,description,lat,lng,status,nickname,submitteddate,responsedate,candidateimageurl';
-		let outputStr = '';
+	function generateOutput(choice) {
+		let outputCSVItems = '';
+		let outputCSVHead = 'id,timestamp,title,description,lat,lng,status,nickname,submitteddate,responsedate,candidateimageurl';
+		let outputSQL = '';
+		let outputSQLA = 'INSERT INTO nomination (id, timestamp, title, description, lat, lng, status, nickname, submitteddate, responsedate, candidateimageurl) VALUES (';
+		let outputSQLB = ') ON DUPLICATE KEY UPDATE ';
 		candidates.forEach(function(item) {
-			outputStr += '\n' + item.id + ',' + item.timestamp + ',"' + item.title + '","' + item.description + '",' + item.lat + ',' + item.lng + ',' + item.status + ',' + item.nickname + ',' + item.submitteddate + ',' + item.responsedate + ',' + item.imageurl;
+			outputCSVItems += '\n' + item.id + ',' + item.timestamp + ',"' + item.title + '","' + item.description + '",' + item.lat + ',' + item.lng + ',' + item.status + ',' + item.nickname + ',' + item.submitteddate + ',' + item.responsedate + ',' + item.imageurl;
 		});
-		let output = outputHl + outputStr;
-		return output;
+		let outputCSV = outputCSVHead + outputCSVItems;
+
+		candidates.forEach(function(item) {
+			outputSQL += outputSQLA + '"' + item.id + '",' + item.timestamp + ',"' + item.title + '","' + item.description + '",' + item.lat + ',' + item.lng + ',"' + item.status + '","' + item.nickname + '",' + item.submitteddate + ',' + item.responsedate + ',"' + item.imageurl + '"' + outputSQLB + 'title="' + item.title + '", description="' + item.description + '", lat=' + item.lat + ', lng=' + item.lng + ', status="' + item.status + '", nickname="' + item.nickname + '", submitteddate=' + item.submitteddate + ', responsedate=' + item.responsedate + ', candidateimageurl="' + item.imageurl + '";\n';
+		})
+		if (choice == 'csv') {
+			return outputCSV;
+		} else if (choice == 'sql') {
+		    return outputSQL;
+		}
 	}
 
 	function addExportButton() {

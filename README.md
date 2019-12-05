@@ -41,11 +41,12 @@ After saving it should look like the following:
 
 ## Getting started
 
-Go to the Wayfarer homepage and open your nominations page. If enabled, the script will create an overlay and adds an export button. Data is in CSV format. You can now save your nominations or display them on a map of your convenience.
+Go to the Wayfarer homepage and open your nominations page. If enabled, the script will create an overlay and adds an export button. Data can be in CSV or MySQL format. You can now save your nominations or display them on a map of your convenience.
 
 ### Planned features
 
-* Export to MySQL 
+* Optional input of playername
+* Direct output to file 
 
 ### Thanks
 
